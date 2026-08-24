@@ -353,4 +353,3 @@ for why it will not compile.
 | `cannot find symbol: class Robot` | Run `./mvnw compile` once so Maven downloads the Robocode API |
 | Bot appears but instantly dies | You probably have an exception in `run()`. Robocode shows it in the console — read the stack trace |
 | Changes do not take effect | You edited, but did not recompile. `./mvnw compile` |
-# robocode-arena
