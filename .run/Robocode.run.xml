@@ -1,0 +1,24 @@
+<component name="ProjectRunConfigurationManager">
+  <!--
+    Launches Robocode from IntelliJ.
+
+    robocode.jar reaches the classpath through the "robocode-local" profile in
+    pom.xml, not through this file. That profile turns itself on only when the jar
+    exists, so CI never sees it.
+
+    WORKING_DIRECTORY must be the Robocode install — that is how Robocode finds its
+    own plugins. Watch the console on startup: "Loading plugins from <dir>/libs".
+    If you installed somewhere other than ~/robocode, change it here.
+  -->
+  <configuration default="false" name="Robocode" type="Application"
+                 factoryName="Application" nameIsGenerated="false">
+    <option name="MAIN_CLASS_NAME" value="robocode.Robocode" />
+    <module name="robocode-bots" />
+    <option name="VM_PARAMETERS"
+            value="-Xmx512M -Dsun.io.useCanonCaches=false -Ddebug=true -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED" />
+    <option name="WORKING_DIRECTORY" value="$USER_HOME$/robocode" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

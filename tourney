@@ -1,0 +1,5 @@
+#!/bin/sh
+# Runs Robocode battles between the bots in this repo. See README.
+# Everything lives in tools/Tourney.java — this just launches it from the repo root.
+cd "$(dirname "$0")" || exit 1
+exec java tools/Tourney.java "$@"

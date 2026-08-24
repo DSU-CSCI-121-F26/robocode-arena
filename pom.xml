@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>edu.desu.cis</groupId>
+  <artifactId>robocode-bots</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Robocode Bots</name>
+
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>5.10.0</junit.version>
+    <surefire.version>3.2.5</surefire.version>
+    <robocode.version>1.11.1</robocode.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <!-- Robocode's Robot API. 'provided' because the Robocode app supplies it at battle time. -->
+    <dependency>
+      <groupId>net.sf.robocode</groupId>
+      <artifactId>robocode.api</artifactId>
+      <version>${robocode.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <!--
+      Puts robocode.jar on the classpath so Robocode can be launched from IntelliJ.
+
+      robocode.jar holds the main class (robocode.Robocode) and is the one piece
+      Robocode does not publish to Maven Central, so it has to come from your local
+      install. Only this jar is needed — everything else Robocode loads itself from
+      the working directory.
+
+      The profile turns itself on ONLY if the jar exists, so CI — which has no
+      Robocode install — never sees it and the build stays green.
+
+      Installed somewhere other than ~/robocode? Override it:
+          ./mvnw -Drobocode.home=/path/to/robocode ...
+    -->
+    <profile>
+      <id>robocode-local</id>
+      <activation>
+        <file>
+          <exists>${env.HOME}/robocode/libs/robocode.jar</exists>
+        </file>
+      </activation>
+      <properties>
+        <robocode.home>${env.HOME}/robocode</robocode.home>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>net.sf.robocode</groupId>
+          <artifactId>robocode-launcher</artifactId>
+          <version>1.11.1</version>
+          <scope>system</scope>
+          <systemPath>${robocode.home}/libs/robocode.jar</systemPath>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+
+</project>
