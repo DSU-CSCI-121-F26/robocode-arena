@@ -272,20 +272,69 @@ attention to the scoreboard.
 
 ---
 
-## One upgrade per chapter
+## One upgrade per week
 
-Do these when the matching chapter comes up in class. Each one is small.
+Do these when the matching week comes up in class. Each one is small.
 
-| Chapter | Upgrade to try |
+| Week | Upgrade to try |
 |---|---|
-| **2** — Variables | Change `MOVE_DISTANCE`, `DODGE_DISTANCE`, and `DODGE_TURN`. Find values that beat `sample.Corners`. |
-| **3** — Methods | The `run()` loop is getting crowded. Pull the driving into a `patrol()` method and call it. |
-| **4** — Objects & classes | Give your bot a colour scheme with `setColors()`. Then add a small class that remembers your last known target. |
-| **5** — Branching | In `onScannedRobot`, only fire if the enemy is closer than 300. Save your energy. |
-| **6** — Loops | Replace the back-and-forth patrol with something less predictable. A bot that moves in a pattern is a bot that gets hit. |
-| **7** — Arrays | Keep the last 10 places you scanned an enemy in an array. Are they circling you? |
-| **8** — Inheritance | Change `extends Robot` to `extends AdvancedRobot` — you get non-blocking movement and a lot more control. Then split your bot into a base class and two subclasses with different personalities. |
-| **10** — Exceptions | What happens when your targeting math divides by zero because the enemy is exactly on top of you? Find out. Handle it. |
+| **2** — Variables and types | Change `MOVE_DISTANCE`, `DODGE_DISTANCE`, and `DODGE_TURN`. Find values that beat `sample.Corners`. |
+| **3** — Your first class | Add a small class that remembers the last place you scanned an enemy. Give it fields and a constructor. |
+| **4** — Objects interacting | Give your bot a colour scheme with `setColors()`. Then have your bot *ask* that memory class where to aim. |
+| **5** — Methods | The `run()` loop is getting crowded. Pull the driving into a `patrol()` method and call it. |
+| **6** — Branching, loops, **enums** | Only fire if the enemy is closer than 300 — save your energy. Then add `private enum Mode { PATROL, ENGAGE, EVADE }` and a field to hold the current one. Nothing has to use it yet. |
+| **7** — **State machines** | Now use it. Wrap `run()` in `while (true) { switch (mode) { ... } }` and move between modes: patrol until you scan someone, engage until you get hit, evade, then back to patrol. **This is the single most useful thing in this list — see below.** |
+| **9** — Arrays | Keep the last 10 places you scanned an enemy in an array. Are they circling you? |
+| **10** — Inheritance | Change `extends Robot` to `extends AdvancedRobot` — non-blocking movement and much more control. Then split your bot into a base class and two subclasses with different personalities. |
+| **11** — Polymorphism and interfaces | Make both subclasses satisfy one interface — say `Targeting` with a single `aimAt(ScannedRobotEvent)` method — and swap strategies without touching the bot. |
+| **13** — Exceptions | What happens when your targeting math divides by zero because the enemy is exactly on top of you? Find out. Handle it. |
+
+---
+
+## Why this looks exactly like your term project
+
+Not a coincidence, and worth seeing early.
+
+Your tank and the maze rover you build with your group are **the same shape of program**:
+
+```java
+// Your bot, here
+public class ThunderTank extends Robot {
+    public void run() {
+        while (true) {
+            // decide, then act
+        }
+    }
+}
+
+// The term project rover
+public class MazeRobot extends RobotController {
+    private enum RobotState { CRUISE, IDENTIFY_OBJECT, AVOID_OBJECT, ... }
+
+    public void run() {
+        while (currentState != RobotState.STOP) {
+            switch (currentState) {
+                // decide, then act
+            }
+        }
+    }
+}
+```
+
+Both extend a framework class you did not write. Both put everything in a method called
+`run()`. Both loop until they are done. The rover's version simply has an **enum** and a
+**switch** inside — which is exactly the week 7 upgrade above.
+
+**That is why this repo is worth your time.** The rover is slow to experiment on: a
+battery, a pairing, floor conditions, and three teammates' schedules per attempt. Your
+tank recompiles in one second. Every state-machine mistake you are going to make — the
+state that never transitions, the transition with no matching `case`, the state you set
+but never act on — is cheaper to make here first.
+
+> **One real difference, and it is worth understanding.** Robocode is *event-driven*: you
+> write `onScannedRobot` and the framework calls it when something happens. The rover
+> *polls*: your loop asks the sensors for a reading and then decides. Two ways to
+> structure a control program, and you will have written both.
 
 ---
 
@@ -296,6 +345,18 @@ Look at `BotMath.java` and `BotMathTest.java`.
 A `Robot` can only run inside a battle, which makes it painful to test. So the
 calculations live in `BotMath` instead — plain static methods, no robot involved —
 and JUnit checks them in milliseconds.
+
+**This is the move you will make again on the term project**, and it is worth naming.
+Split the *decision* from the *action*:
+
+| Hard to test | Easy to test |
+|---|---|
+| `ahead(100)` — needs a battle | `firePowerFor(distance)` — needs nothing |
+| `mbot.followLine()` — needs a rover, a floor, and a battery | *"given this colour label, which state comes next?"* — needs nothing |
+
+The actions have to be tried on the real thing. The decisions do not, and the decisions
+are where your bugs actually live. Pull them out into plain methods and you can test the
+brain of your robot on a laptop at midnight with no hardware in the room.
 
 **This is the trick.** Pull the thinking out of the framework so you can test the
 thinking. You will do exactly this to your term project robot later in the semester.
